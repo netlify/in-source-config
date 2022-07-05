@@ -3,6 +3,7 @@ import { promises as fs } from 'fs'
 import { parse } from '@babel/parser'
 import { ArgumentPlaceholder, Expression, SpreadElement, JSXNamespacedName, Program } from '@babel/types'
 
+import { createBindingsMethod } from './bindings.js'
 import { getMainExport } from './exports.js'
 import { getImports } from './imports.js'
 import { parse as parseSchedule } from './properties/schedule.js'
@@ -22,7 +23,12 @@ interface ISCConfig {
 // the property and `data` its value.
 export const findISCDeclarationsInProgram = (ast: Program, config: ISCConfig): ISCValues => {
   const imports = ast.body.flatMap((node) => getImports(node, config.isHelperModule))
-  const mainExports = getMainExport(ast.body)
+
+  const scheduledFuncsExpected = imports.filter(({ imported }) => imported === 'schedule').length
+  let scheduledFuncsFound = 0
+
+  const getAllBindings = createBindingsMethod(ast.body)
+  const mainExports = getMainExport(ast.body, getAllBindings)
   const iscExports = mainExports
     .map(({ args, local: exportName }) => {
       const matchingImport = imports.find(({ local: importName }) => importName === exportName)
@@ -32,9 +38,15 @@ export const findISCDeclarationsInProgram = (ast: Program, config: ISCConfig): I
       }
 
       switch (matchingImport.imported) {
-        case 'schedule':
-          return parseSchedule({ args })
+        case 'schedule': {
+          const parsed = parseSchedule({ args }, getAllBindings)
 
+          if (parsed.schedule) {
+            scheduledFuncsFound += 1
+          }
+
+          return parsed
+        }
         default:
         // no-op
       }
@@ -42,6 +54,13 @@ export const findISCDeclarationsInProgram = (ast: Program, config: ISCConfig): I
       return null
     })
     .filter(nonNullable)
+
+  if (scheduledFuncsFound < scheduledFuncsExpected) {
+    throw new Error(
+      'Warning: unable to find cron expression for scheduled function. `schedule` imported but not called or exported. If you meant to schedule a function, please check that `schedule` is invoked with an appropriate cron expression.',
+    )
+  }
+
   const mergedExports: ISCValues = iscExports.reduce((acc, obj) => ({ ...acc, ...obj }), {})
 
   return mergedExports

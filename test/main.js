@@ -56,12 +56,69 @@ const testCases = [
       isHelperModule: (path) => path === 'netlify:edge',
     },
   },
+  {
+    file: 'cron_cjs_invalid_cron_expression.js',
+    expectedError:
+      'Warning: unable to find cron expression for scheduled function. `schedule` imported but not called or exported. If you meant to schedule a function, please check that `schedule` is invoked with an appropriate cron expression.',
+  },
+  {
+    file: 'cron_cjs_schedule_not_called.js',
+    expectedError:
+      'Warning: unable to find cron expression for scheduled function. `schedule` imported but not called or exported. If you meant to schedule a function, please check that `schedule` is invoked with an appropriate cron expression.',
+  },
+  {
+    file: 'cron_esm_additional_schedule_import.js',
+    expected: {
+      schedule: '@daily',
+    },
+  },
+  {
+    file: 'cron_esm_no_direct_export_renamed_reassigned.js',
+    expected: {
+      schedule: '@daily',
+    },
+  },
+  {
+    file: 'cron_esm_no_direct_export_renamed.js',
+    expected: {
+      schedule: '@daily',
+    },
+  },
+  {
+    file: 'cron_esm_no_direct_export.js',
+    expected: {
+      schedule: '@daily',
+    },
+  },
+  {
+    file: 'cron_esm_schedule_not_called.js',
+    expectedError:
+      'Warning: unable to find cron expression for scheduled function. `schedule` imported but not called or exported. If you meant to schedule a function, please check that `schedule` is invoked with an appropriate cron expression.',
+  },
+  {
+    file: 'cron_esm_schedule_reassigned.js',
+    expected: {
+      schedule: '@daily',
+    },
+  },
 ]
 
 for (const testCase of testCases) {
-  const { expected, file, config = { isHelperModule: (path) => path === '@netlify/functions' } } = testCase
+  const {
+    expected,
+    expectedError,
+    file,
+    config = { isHelperModule: (path) => path === '@netlify/functions' },
+  } = testCase
   test(`${file}`, async (t) => {
-    const result = await findISCDeclarationsInPath(join('test', 'fixtures', file), config)
-    t.deepEqual(result, expected)
+    const path = join('test', 'fixtures', file)
+    if (expectedError) {
+      await t.throwsAsync(() => findISCDeclarationsInPath(path, config), {
+        message: expectedError,
+      })
+    } else {
+      const result = await findISCDeclarationsInPath(path, config)
+      t.deepEqual(result, expected)
+    }
   })
 }
