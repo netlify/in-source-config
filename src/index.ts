@@ -8,15 +8,20 @@ import { getImports } from './imports.js'
 import { parse as parseSchedule } from './properties/schedule.js'
 import { nonNullable } from './utils.js'
 
-export const IN_SOURCE_CONFIG_MODULE = '@netlify/functions'
-
 export type ISCValues = Partial<ReturnType<typeof parseSchedule>>
+
+interface ISCConfig {
+  /**
+   * The name of the module that helpers like `schedule` are imported from.
+   */
+  helperModule: string
+}
 
 // Parses a JS/TS file and looks for in-source config declarations. It returns
 // an array of all declarations found, with `property` indicating the name of
 // the property and `data` its value.
-export const findISCDeclarationsInProgram = (ast: Program): ISCValues => {
-  const imports = ast.body.flatMap((node) => getImports(node, IN_SOURCE_CONFIG_MODULE))
+export const findISCDeclarationsInProgram = (ast: Program, config: ISCConfig): ISCValues => {
+  const imports = ast.body.flatMap((node) => getImports(node, config.helperModule))
   const mainExports = getMainExport(ast.body)
   const iscExports = mainExports
     .map(({ args, local: exportName }) => {
@@ -74,10 +79,10 @@ const safelyParseFile = async (path: string) => {
   }
 }
 
-export const findISCDeclarationsInPath = async (path: string): Promise<ISCValues | null> => {
+export const findISCDeclarationsInPath = async (path: string, config: ISCConfig): Promise<ISCValues | null> => {
   const program = await safelyParseFile(path)
   if (!program) {
     return null
   }
-  return findISCDeclarationsInProgram(program)
+  return findISCDeclarationsInProgram(program, config)
 }

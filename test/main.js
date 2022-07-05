@@ -46,13 +46,22 @@ const testCases = [
     expected: {
       schedule: "@daily"
     }
+  },
+  {
+    file: "cron_edge_functions.ts",
+    expected: {
+      schedule: "@daily"
+    },
+    config: {
+      helperModule: "netlify:edge"
+    }
   }
 ]
 
 for (const testCase of testCases) {
-  const { expected, file } = testCase
+  const { expected, file, config = { helperModule: "@netlify/functions" } } = testCase
   test(`${file}`, async t => {
-    const result = await findISCDeclarationsInPath(join("test", "fixtures", file))
+    const result = await findISCDeclarationsInPath(join("test", "fixtures", file), config)
     t.deepEqual(result, expected)
   })
 }
