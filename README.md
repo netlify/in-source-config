@@ -1,7 +1,7 @@
-[![Build](https://github.com/netlify/in-source-configuration/workflows/Build/badge.svg)](https://github.com/netlify/in-source-configuration/actions)
-[![Node](https://img.shields.io/node/v/@netlify/in-source-configuration.svg?logo=node.js)](https://www.npmjs.com/package/@netlify/in-source-configuration)
+[![Build](https://github.com/netlify/in-source-config/workflows/Build/badge.svg)](https://github.com/netlify/in-source-config/actions)
+[![Node](https://img.shields.io/node/v/@netlify/in-source-config.svg?logo=node.js)](https://www.npmjs.com/package/@netlify/in-source-config)
 
-# in-source-configuration
+# in-source-config
 
 Update me!
 
