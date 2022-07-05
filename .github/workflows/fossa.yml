@@ -3,8 +3,8 @@ name: Dependency License Scanning
 on:
   push:
     branches:
-      - chore/fossa-workflow
       - main
+      - chore/fossa-workflow
 
 defaults:
   run:
@@ -15,12 +15,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Download fossa cli
         run: |-
           mkdir -p $HOME/.local/bin
           curl https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | bash -s -- -b $HOME/.local/bin
           echo "$HOME/.local/bin" >> $GITHUB_PATH
+
       - name: Fossa init
         run: fossa init
       - name: Set env
