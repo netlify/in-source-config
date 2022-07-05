@@ -4,27 +4,27 @@ import { isImport, isRequire } from './helpers.js'
 import { nonNullable } from './utils.js'
 
 // Finds import/require statements of a given path in an AST.
-export const getImports = (node: Statement, importPath: string) => {
-  const esmImports = getImportsFromESM(node, importPath)
+export const getImports = (node: Statement, isHelperModule: (path: string) => boolean) => {
+  const esmImports = getImportsFromESM(node, isHelperModule)
 
   if (esmImports.length !== 0) {
     return esmImports
   }
 
-  const cjsImports = getImportsFromCJS(node, importPath)
+  const cjsImports = getImportsFromCJS(node, isHelperModule)
 
   return cjsImports
 }
 
 // Finds import/require statements of a given path in a CJS AST.
-const getImportsFromCJS = (node: Statement, importPath: string) => {
+const getImportsFromCJS = (node: Statement, isHelperModule: (path: string) => boolean) => {
   if (node.type !== 'VariableDeclaration') {
     return []
   }
 
   const { declarations } = node
   const requireDeclaration = declarations.find(
-    (declaration) => declaration.type === 'VariableDeclarator' && isRequire(declaration.init, importPath),
+    (declaration) => declaration.type === 'VariableDeclarator' && isRequire(declaration.init, isHelperModule),
   )
 
   if (requireDeclaration === undefined || requireDeclaration.id.type !== 'ObjectPattern') {
@@ -51,8 +51,8 @@ const getImportsFromCJS = (node: Statement, importPath: string) => {
 }
 
 // Finds import/require statements of a given path in an ESM AST.
-const getImportsFromESM = (node: Statement, importPath: string) => {
-  if (!isImport(node, importPath)) {
+const getImportsFromESM = (node: Statement, isHelperModule: (path: string) => boolean) => {
+  if (!isImport(node, isHelperModule)) {
     return []
   }
 

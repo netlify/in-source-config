@@ -53,13 +53,13 @@ const testCases = [
       schedule: "@daily"
     },
     config: {
-      helperModule: "netlify:edge"
+      isHelperModule: path => path === "netlify:edge"
     }
   }
 ]
 
 for (const testCase of testCases) {
-  const { expected, file, config = { helperModule: "@netlify/functions" } } = testCase
+  const { expected, file, config = { isHelperModule: path => path === "@netlify/functions" } } = testCase
   test(`${file}`, async t => {
     const result = await findISCDeclarationsInPath(join("test", "fixtures", file), config)
     t.deepEqual(result, expected)

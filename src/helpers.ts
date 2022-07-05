@@ -28,8 +28,8 @@ const isDotExpression = (node: Expression, expression: string[]): boolean => {
   return node.object.type === 'Identifier' && object[0] === node.object.name && property === node.property.name
 }
 
-export const isImport = (node: Statement, importPath: string): node is ImportDeclaration =>
-  node.type === 'ImportDeclaration' && node.source.value === importPath
+export const isImport = (node: Statement, checkImportPath: (path: string) => boolean): node is ImportDeclaration =>
+  node.type === 'ImportDeclaration' && checkImportPath(node.source.value)
 
 export const isModuleExports = (
   node: Statement,
@@ -40,13 +40,13 @@ export const isModuleExports = (
   node.expression.left.type === 'MemberExpression' &&
   isDotExpression(node.expression.left, dotExpression)
 
-export const isRequire = (node: Expression | undefined | null, requirePath: string) => {
+export const isRequire = (node: Expression | undefined | null, checkPath: (path: string) => boolean) => {
   if (!node || node.type !== 'CallExpression') {
     return false
   }
 
   const { arguments: args, callee } = node
-  const isRequiredModule = args[0]?.type === 'StringLiteral' && isRequirePath(args[0], requirePath)
+  const isRequiredModule = args[0]?.type === 'StringLiteral' && isRequirePath(args[0], checkPath)
 
   return isRequireCall(callee) && isRequiredModule
 }
@@ -54,4 +54,5 @@ export const isRequire = (node: Expression | undefined | null, requirePath: stri
 const isRequireCall = (node: Expression | V8IntrinsicIdentifier) =>
   node.type === 'Identifier' && node.name === 'require'
 
-const isRequirePath = (node: StringLiteral, path: string) => node.type === 'StringLiteral' && node.value === path
+const isRequirePath = (node: StringLiteral, checkPath: (path: string) => boolean) =>
+  node.type === 'StringLiteral' && checkPath(node.value)

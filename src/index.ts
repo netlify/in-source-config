@@ -14,14 +14,14 @@ interface ISCConfig {
   /**
    * The name of the module that helpers like `schedule` are imported from.
    */
-  helperModule: string
+  isHelperModule(name: string): boolean
 }
 
 // Parses a JS/TS file and looks for in-source config declarations. It returns
 // an array of all declarations found, with `property` indicating the name of
 // the property and `data` its value.
 export const findISCDeclarationsInProgram = (ast: Program, config: ISCConfig): ISCValues => {
-  const imports = ast.body.flatMap((node) => getImports(node, config.helperModule))
+  const imports = ast.body.flatMap((node) => getImports(node, config.isHelperModule))
   const mainExports = getMainExport(ast.body)
   const iscExports = mainExports
     .map(({ args, local: exportName }) => {
