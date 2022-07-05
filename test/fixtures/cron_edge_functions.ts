@@ -1,5 +1,5 @@
 import { schedule } from 'netlify:edge'
 
 export const handler = schedule('@daily', () => {
-  console.log("hello world")
+  console.log('hello world')
 })

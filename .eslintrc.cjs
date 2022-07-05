@@ -3,6 +3,7 @@
 const { overrides } = require('@netlify/eslint-config-node/.eslintrc_esm.cjs')
 
 module.exports = {
+  ignorePatterns: ['test/fixtures/'],
   extends: '@netlify/eslint-config-node/.eslintrc_esm.cjs',
   rules: {
     'n/no-missing-import': 'off',

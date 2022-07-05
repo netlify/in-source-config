@@ -1,67 +1,67 @@
-import { join } from "path"
+import { join } from 'path'
 
 import test from 'ava'
 
-import { findISCDeclarationsInPath } from "../dist/index.js"
+import { findISCDeclarationsInPath } from '../dist/index.js'
 
 const testCases = [
   {
-    file: "cron_cjs_exports.js",
+    file: 'cron_cjs_exports.js',
     expected: {
-      schedule: "@daily"
-    }
+      schedule: '@daily',
+    },
   },
   {
-    file: "cron_cjs_renamed.js",
+    file: 'cron_cjs_renamed.js',
     expected: {
-      schedule: "@daily"
-    }
+      schedule: '@daily',
+    },
   },
   {
-    file: "cron_cjs.js",
+    file: 'cron_cjs.js',
     expected: {
-      schedule: "@daily"
-    }
+      schedule: '@daily',
+    },
   },
   {
-    file: "cron_esm_renamed.js",
+    file: 'cron_esm_renamed.js',
     expected: {
-      schedule: "@daily"
-    }
+      schedule: '@daily',
+    },
   },
   {
-    file: "cron_esm.js",
+    file: 'cron_esm.js',
     expected: {
-      schedule: "@daily"
-    }
+      schedule: '@daily',
+    },
   },
   {
-    file: "cron_ts_renamed.ts",
+    file: 'cron_ts_renamed.ts',
     expected: {
-      schedule: "@daily"
-    }
+      schedule: '@daily',
+    },
   },
   {
-    file: "cron_ts.ts",
+    file: 'cron_ts.ts',
     expected: {
-      schedule: "@daily"
-    }
+      schedule: '@daily',
+    },
   },
   {
-    file: "cron_edge_functions.ts",
+    file: 'cron_edge_functions.ts',
     expected: {
-      schedule: "@daily"
+      schedule: '@daily',
     },
     config: {
-      isHelperModule: path => path === "netlify:edge"
-    }
-  }
+      isHelperModule: (path) => path === 'netlify:edge',
+    },
+  },
 ]
 
 for (const testCase of testCases) {
-  const { expected, file, config = { isHelperModule: path => path === "@netlify/functions" } } = testCase
-  test(`${file}`, async t => {
-    const result = await findISCDeclarationsInPath(join("test", "fixtures", file), config)
+  const { expected, file, config = { isHelperModule: (path) => path === '@netlify/functions' } } = testCase
+  test(`${file}`, async (t) => {
+    const result = await findISCDeclarationsInPath(join('test', 'fixtures', file), config)
     t.deepEqual(result, expected)
   })
 }
