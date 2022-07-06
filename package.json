@@ -1,6 +1,5 @@
 {
   "name": "@netlify/in-source-config",
-  "private": true,
   "version": "0.0.0",
   "description": "A parser for Netlify's in-source-config",
   "type": "module",
