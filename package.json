@@ -1,6 +1,6 @@
 {
   "name": "@netlify/in-source-config",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "A parser for Netlify's in-source-config",
   "type": "module",
   "main": "./dist/index.js",
